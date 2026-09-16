@@ -88,9 +88,10 @@ export function Wishlist() {
     }
 
     function handleDeleteList(id){
-        setLists(lists.filter((list) => list.id !== id))
+        setLists(lists.filter((list) => list.id !== id));
         setDialog(false);
-        setShlistDelete(null)
+        setShlistDelete(null);
+        setShlistChoose(null);
     }
 
     function handleDeleteBook(book, id){
