@@ -2,17 +2,18 @@ import { useState } from "react"
 import { useEffect } from "react";
 import { FaSearch } from "react-icons/fa"
 import { WishlistCard } from "../components/WishlistCard"
+import { Book, WishlistProp } from "../types"
 
 export function Wishlist() {
     const [search, setSearch] = useState("");
-    const [data, setData] = useState([]);
-    const [bookSelect, setBookSelect] = useState(null);
+    const [data, setData] = useState<Book[]>([]);
+    const [bookSelect, setBookSelect] = useState<Book | null>(null);
     const [listButton, setListButton] = useState(false);
-    const [lists, setLists] = useState(JSON.parse(localStorage.getItem("lists"))||[]);
+    const [lists, setLists] = useState<WishlistProp[]>(JSON.parse(localStorage.getItem("lists") || "[]"));
     const [listCreate, setListCreate] = useState(false);
     const [listName, setListName] = useState("");
-    const [shlistChoose, setShlistChoose] = useState(null)
-    const [shlistDelete, setShlistDelete] = useState(null)
+    const [shlistChoose, setShlistChoose] = useState<WishlistProp | null>(null)
+    const [shlistDelete, setShlistDelete] = useState<WishlistProp | null>(null)
     const [dialog, setDialog] = useState(false)
     const [error, setError] = useState("")
 
@@ -46,7 +47,7 @@ export function Wishlist() {
         }
     }, [search])
 
-    function handleClick(book) {
+    function handleClick(book: Book) {
         setListButton(prev => !prev)
         setBookSelect(book)
     }
@@ -56,8 +57,9 @@ export function Wishlist() {
         setListButton(false)
     }
 
-    function handleCreateList(e) {
+    function handleCreateList(e: React.SyntheticEvent) {
         e.preventDefault();
+        if(!bookSelect) return;
         let newObj = {id: Date.now(), text: listName, books: [bookSelect]};
         setLists([...lists, newObj])
         setListButton(false)
@@ -66,39 +68,41 @@ export function Wishlist() {
         setData([])
     }
 
-    function handleListName(e) {
+    function handleListName(e: React.ChangeEvent<HTMLInputElement>) {
         setListName(e.target.value)
     }
 
-    function handleAddToList(e) {
+    function handleAddToList(e: React.SyntheticEvent) {
         e.preventDefault()
+        if(!bookSelect) return;
+        if(!shlistChoose) return;
         setLists(lists.map((item) => item.id === shlistChoose.id?{...item, books: item.books.some((b) => b.key === bookSelect.key) ? item.books : [...item.books, bookSelect]}:item ))
         setListButton(false)
         setSearch("")
         setData([])
     }
     
-    function handleShlistChoose(wishlist) {
+    function handleShlistChoose(wishlist: WishlistProp) {
         setShlistChoose(wishlist)
     }
 
-    function handleRemoveDialog(list) {
+    function handleRemoveDialog(list: WishlistProp) {
         setShlistDelete(list)
         setDialog(true)
     }
 
-    function handleDeleteList(id){
+    function handleDeleteList(id: number){
         setLists(lists.filter((list) => list.id !== id));
         setDialog(false);
         setShlistDelete(null);
         setShlistChoose(null);
     }
 
-    function handleDeleteBook(book, id){
+    function handleDeleteBook(book: Book, id: number){
         setLists(lists.map((item) => item.id === id?{...item, books: item.books.filter((b) => book.key !== b.key)}:item))
     }
 
-    function handleChange(e) {
+    function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
         setSearch(e.target.value)
     }
 
@@ -118,12 +122,12 @@ export function Wishlist() {
                             </div>
                         </li>))}
                 </ul>
-                {listButton ? 
+                {listButton && bookSelect ? 
                     <div className="fixed inset-0 z-50 bg-black/20 backdrop-blur-sm flex items-center justify-center">
                         <div className="bg-white/70 backdrop-blur-md rounded-2xl shadow-lg p-6">
                             <p className="font-bold text-amber-800 text-center">{bookSelect.title}</p> 
                             <div className="flex">
-                                <button className="mr-3" onClick={(e) => handleShowCreateList(e)} >Create list</button> 
+                                <button className="mr-3" onClick={() => handleShowCreateList()} >Create list</button> 
                                 <button className="border-l border-gray-400 pl-3 " onClick={(e) => handleAddToList(e)}>Add to list</button>
                             </div> 
                                 <button className="absolute top-0 right-2" onClick={() => {setListButton(false)}} >×</button>
@@ -141,7 +145,7 @@ export function Wishlist() {
                         </div>
                     </div>
                 : null}
-                {dialog ? 
+                {dialog && shlistDelete ? 
                     <div className="fixed inset-0 z-50 bg-black/20 backdrop-blur-sm flex items-center justify-center">
                         <div className="bg-white/70 backdrop-blur-md rounded-2xl shadow-lg p-6">
                             <p className="font-bold text-amber-800 text-center">Do you want to delete this wish list?</p>
@@ -158,7 +162,7 @@ export function Wishlist() {
                 {error === ""?null:<p>{error}</p>}
             </div>
             <div>
-                {shlistChoose ? <WishlistCard books={lists.find((e) => e.id === shlistChoose.id).books} onDeleteBook={(book) => handleDeleteBook(book, shlistChoose.id)} /> : null}
+                {shlistChoose ? <WishlistCard books={lists.find((e) => e.id === shlistChoose.id)?.books ?? []} onDeleteBook={(book) => handleDeleteBook(book, shlistChoose.id)} /> : null}
             </div>
         </div>
     )

@@ -1,6 +1,11 @@
+import { Book } from "../types"
 
+interface BookCardProps {
+    book: Book
+    onDelete: (book: Book) => void
+} 
 
-export function BookCard({ book, onDelete}) {
+export function BookCard({ book, onDelete}: BookCardProps) {
     return (
     <div className="p-4 border-2 border-black rounded-2xl shadow-md relative flex w-72 flex-none gap-4">
         <img className="w-24 h-34 object-cover" src={`https://covers.openlibrary.org/b/id/${book.cover_i}-M.jpg`}></img>
