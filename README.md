@@ -1,16 +1,40 @@
-# React + Vite
+# 📚 BookShlist
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A book wishlist app where you can search for books, organize them into custom lists, and keep track of what you want to read next.
 
-Currently, two official plugins are available:
+🔗 **Live demo:** [bookshlist.vercel.app](https://bookshlist.vercel.app)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+![BookShlist screenshot](./screenshot.png)
 
-## React Compiler
+## Features
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- 🔍 Live search across a large book database (Open Library API)
+- 📝 Create multiple wishlists to organize books by genre or category
+- 📖 Add and remove books from any wishlist
+- 🚫 Duplicate protection — the same book can't be added twice to one list
+- 💾 Persistent storage via localStorage
+- 📱 Fully responsive layout (mobile, tablet, desktop)
+- ✅ Tested with Vitest and React Testing Library
 
-## Expanding the ESLint configuration
+## Tech Stack
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- React + Vite
+- TypeScript
+- Tailwind CSS
+- Vitest / React Testing Library
+- Open Library API
+
+## Running locally
+
+```bash
+git clone https://github.com/GettMaaz/bookshlist.git
+cd bookshlist
+npm install
+npm run dev
+```
+
+## Running tests
+
+```bash
+npm run test
+```
