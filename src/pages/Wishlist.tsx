@@ -9,13 +9,34 @@ export function Wishlist() {
     const [data, setData] = useState<Book[]>([]);
     const [bookSelect, setBookSelect] = useState<Book | null>(null);
     const [listButton, setListButton] = useState(false);
-    const [lists, setLists] = useState<WishlistProp[]>(JSON.parse(localStorage.getItem("lists") || "[]"));
+    const [lists, setLists] = useState<WishlistProp[]>([]);
     const [listCreate, setListCreate] = useState(false);
     const [listName, setListName] = useState("");
     const [shlistChoose, setShlistChoose] = useState<WishlistProp | null>(null)
     const [shlistDelete, setShlistDelete] = useState<WishlistProp | null>(null)
     const [dialog, setDialog] = useState(false)
     const [error, setError] = useState("")
+
+    async function nactiKnihy(id: number) {
+    const res = await fetch(`http://localhost:3000/wishlists/${id}/books`)
+    const knihy = await res.json()
+    return knihy
+    }
+
+    useEffect(() => {
+        async function nacti() {
+            const res = await fetch('http://localhost:3000/wishlists')
+            const data = await res.json()
+            const hotove = await Promise.all(
+                data.map(async (p: { id: number; name: string }) => {
+                    const knihy = await nactiKnihy(p.id)
+                    return { id: p.id, text: p.name, books: knihy}
+                })
+            )
+            setLists(hotove)
+        }
+        nacti() 
+    }, [])
 
     useEffect(() => {
         console.log(lists)
@@ -57,10 +78,21 @@ export function Wishlist() {
         setListButton(false)
     }
 
-    function handleCreateList(e: React.SyntheticEvent) {
+    async function handleCreateList(e: React.SyntheticEvent) {
         e.preventDefault();
         if(!bookSelect) return;
-        let newObj = {id: Date.now(), text: listName, books: [bookSelect]};
+        const res = await fetch('http://localhost:3000/wishlists', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name: listName})
+        })
+        const created = await res.json()
+        await fetch(`http://localhost:3000/wishlists/${created.id}/books`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ key: bookSelect.key, title: bookSelect.title, author_name: bookSelect.author_name, cover_i: bookSelect.cover_i})
+            })
+        let newObj = {id: created.id, text: listName, books: [bookSelect]};
         setLists([...lists, newObj])
         setListButton(false)
         setListCreate(false)
