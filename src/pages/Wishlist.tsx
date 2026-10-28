@@ -104,10 +104,15 @@ export function Wishlist() {
         setListName(e.target.value)
     }
 
-    function handleAddToList(e: React.SyntheticEvent) {
+    async function handleAddToList(e: React.SyntheticEvent) {
         e.preventDefault()
         if(!bookSelect) return;
         if(!shlistChoose) return;
+        await fetch(`http://localhost:3000/wishlists/${shlistChoose.id}/books`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ key: bookSelect.key, title: bookSelect.title, author_name: bookSelect.author_name, cover_i: bookSelect.cover_i })
+        })
         setLists(lists.map((item) => item.id === shlistChoose.id?{...item, books: item.books.some((b) => b.key === bookSelect.key) ? item.books : [...item.books, bookSelect]}:item ))
         setListButton(false)
         setSearch("")
@@ -123,14 +128,16 @@ export function Wishlist() {
         setDialog(true)
     }
 
-    function handleDeleteList(id: number){
+    async function handleDeleteList(id: number){
+        await fetch(`http://localhost:3000/wishlists/${id}`, { method: 'DELETE' })
         setLists(lists.filter((list) => list.id !== id));
         setDialog(false);
         setShlistDelete(null);
         setShlistChoose(null);
     }
 
-    function handleDeleteBook(book: Book, id: number){
+    async function handleDeleteBook(book: Book, id: number){
+        await fetch(`http://localhost:3000/wishlists/${id}/books/${encodeURIComponent(book.key)}`, { method: 'DELETE' })
         setLists(lists.map((item) => item.id === id?{...item, books: item.books.filter((b) => book.key !== b.key)}:item))
     }
 
