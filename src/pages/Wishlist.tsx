@@ -43,8 +43,6 @@ export function Wishlist() {
         console.log(shlistChoose)
     }, [lists, shlistChoose])
 
-    useEffect(() => {localStorage.setItem("lists", JSON.stringify(lists))}, [lists])
-
     useEffect(() => {
         const timer = setTimeout(() => {
             const fetchBooks = async () => {
