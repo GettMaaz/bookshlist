@@ -25,15 +25,19 @@ export function Wishlist() {
 
     useEffect(() => {
         async function nacti() {
-            const res = await fetch('http://localhost:3000/wishlists')
-            const data = await res.json()
-            const hotove = await Promise.all(
-                data.map(async (p: { id: number; name: string }) => {
-                    const knihy = await nactiKnihy(p.id)
-                    return { id: p.id, text: p.name, books: knihy}
-                })
-            )
-            setLists(hotove)
+            try {
+                const res = await fetch('http://localhost:3000/wishlists')
+                const data = await res.json()
+                const hotove = await Promise.all(
+                    data.map(async (p: { id: number; name: string }) => {
+                        const knihy = await nactiKnihy(p.id)
+                        return { id: p.id, text: p.name, books: knihy}
+                    })
+                )
+                setLists(hotove)
+            } catch (err) {
+                console.error(err)
+            }
         }
         nacti() 
     }, [])

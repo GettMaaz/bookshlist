@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from "@testing-library/react"
+import { render, screen, fireEvent, waitFor } from "@testing-library/react"
 import { describe, it, expect, vi, beforeEach } from "vitest"
 import { Wishlist } from "./Wishlist"
 
@@ -19,11 +19,14 @@ describe("Wishlist component", () => {
     })
     it("testing API", async () => {
         // eslint-disable-next-line no-undef
-        global.fetch = vi.fn(() => 
-            Promise.resolve({
-                json: () => Promise.resolve({ docs: [{ key: "/works/0L1W", title: "Harry Potter", author_name: ["J.K. Rowling"] }]})
+        global.fetch = vi.fn((url) => {
+            if (url.includes("localhost:3000")) {
+                return Promise.resolve({ json: () => Promise.resolve([]) })
+            }
+            return Promise.resolve({
+                json: () => Promise.resolve({ docs: [{ key: "/works/0L1W", title: "Harry Potter", author_name: ["J.K. Rowling"] }] })
             })
-        )
+        })
         render(<Wishlist />)
         const input = screen.getByRole("textbox")
         fireEvent.change(input, { target: { value: "harry" } })
@@ -32,11 +35,14 @@ describe("Wishlist component", () => {
     })
     it("testing create wishlist", async () => {
         // eslint-disable-next-line no-undef
-        global.fetch = vi.fn(() =>
-            Promise.resolve({
+        global.fetch = vi.fn((url) => {
+            if (url.includes("localhost:3000")) {
+                return Promise.resolve({ json: () => Promise.resolve([]) })
+            }
+            return Promise.resolve({
                 json: () => Promise.resolve({ docs: [{ key: "/works/01LW", title: "Harry Potter", author_name: ["J.K. Rowling"] }] })
             })
-        )
+        })
         render(<Wishlist />)
         const input = screen.getByRole("textbox")
         fireEvent.change(input, { target: { value: "harry" } })
@@ -46,18 +52,21 @@ describe("Wishlist component", () => {
         fireEvent.click(createList)
         const inputs = screen.getAllByRole("textbox");
         fireEvent.change(inputs[1], { target: { value: "fantasy" } })
-        const create = screen.getByText("create")
+        const create = screen.getByText("Create")
         fireEvent.click(create);
-        const listName = screen.getByText("fantasy");
+        const listName = await screen.findByText(/fantasy/);
         expect(listName).toBeInTheDocument()
     })
     it("testing delete book from wishlist", async () => {
         // eslint-disable-next-line no-undef
-        global.fetch = vi.fn(() => 
-            Promise.resolve({
+        global.fetch = vi.fn((url) => {
+            if (url.includes("localhost:3000")) {
+                return Promise.resolve({ json: () => Promise.resolve([]) })
+            }
+            return Promise.resolve({
                 json: () => Promise.resolve({ docs: [{ key: "/works/01LW", title: "Harry Potter", author_name: ["J.K. Rowling"] }] })
             })
-        )
+        })
         render(<Wishlist />);
         const input = screen.getByRole("textbox");
         fireEvent.change(input, { target: { value: "harry" } });
@@ -67,14 +76,15 @@ describe("Wishlist component", () => {
         fireEvent.click(createList);
         const inputs = screen.getAllByRole("textbox");
         fireEvent.change(inputs[1], { target: { value: "fantasy" } });
-        const create = screen.getByText("create");
+        const create = screen.getByText("Create");
         fireEvent.click(create)
-        const listName = screen.getByText("fantasy");
+        const listName = await screen.findByText(/fantasy/);
         fireEvent.click(listName)
         const cross = screen.getAllByText("×");
         fireEvent.click(cross[1])
-        const bookTitle = screen.queryByText("Harry Potter");
-        expect(bookTitle).not.toBeInTheDocument()
+        await waitFor(() => {
+            expect(screen.queryByText("Harry Potter")).not.toBeInTheDocument()
+        })
     })
     it("testing fail API", async () => {
         // eslint-disable-next-line no-undef
