@@ -1,10 +1,20 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react"
-import { describe, it, expect, vi, beforeEach } from "vitest"
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest"
 import { Wishlist } from "./Wishlist"
 
 describe("Wishlist component", () => {
     beforeEach(() => {
-        localStorage.clear()
+        // Default fetch stub, so no test ever reaches the real network or backend.
+        // Tests that need specific data override it with their own global.fetch.
+        vi.stubGlobal("fetch", vi.fn((url) => {
+            if (url.includes("localhost:3000")) {
+                return Promise.resolve({ json: () => Promise.resolve([]) })
+            }
+            return Promise.resolve({ json: () => Promise.resolve({ docs: [] }) })
+        }))
+    })
+    afterEach(() => {
+        vi.unstubAllGlobals()
     })
     it("display the search input field", () => {
         render(<Wishlist />)

@@ -12,7 +12,7 @@ A book wishlist app where you can search for books, organize them into custom li
 - 📝 Create multiple wishlists to organize books by genre or category
 - 📖 Add and remove books from any wishlist
 - 🚫 Duplicate protection — the same book can't be added twice to one list
-- 💾 Persistent storage via localStorage
+- 💾 Persistent storage via a REST API backend
 - 📱 Fully responsive layout (mobile, tablet, desktop)
 - ✅ Tested with Vitest and React Testing Library
 
