@@ -4,7 +4,7 @@ import { FaSearch } from "react-icons/fa"
 import { WishlistCard } from "../components/WishlistCard"
 import { Book, WishlistProp } from "../types"
 
-const API_URL = 'http://localhost:3000'
+const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3000'
 
 export function Wishlist() {
     const [search, setSearch] = useState("");
@@ -20,7 +20,7 @@ export function Wishlist() {
     const [error, setError] = useState("")
 
     async function nactiKnihy(id: number) {
-    const res = await fetch(`${API_URL}/${id}/books`)
+    const res = await fetch(`${API_URL}/wishlists/${id}/books`)
     const knihy = await res.json()
     return knihy
     }
@@ -28,7 +28,7 @@ export function Wishlist() {
     useEffect(() => {
         async function nacti() {
             try {
-                const res = await fetch(`${API_URL}`)
+                const res = await fetch(`${API_URL}/wishlists`)
                 const data = await res.json()
                 const hotove = await Promise.all(
                     data.map(async (p: { id: number; name: string }) => {
@@ -85,13 +85,13 @@ export function Wishlist() {
     async function handleCreateList(e: React.SyntheticEvent) {
         e.preventDefault();
         if(!bookSelect) return;
-        const res = await fetch(`${API_URL}`, {
+        const res = await fetch(`${API_URL}/wishlists`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ name: listName})
         })
         const created = await res.json()
-        await fetch(`${API_URL}/${created.id}/books`, {
+        await fetch(`${API_URL}/wishlists/${created.id}/books`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ key: bookSelect.key, title: bookSelect.title, author_name: bookSelect.author_name, cover_i: bookSelect.cover_i})
@@ -112,7 +112,7 @@ export function Wishlist() {
         e.preventDefault()
         if(!bookSelect) return;
         if(!shlistChoose) return;
-        await fetch(`${API_URL}/${shlistChoose.id}/books`, {
+        await fetch(`${API_URL}/wishlists/${shlistChoose.id}/books`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ key: bookSelect.key, title: bookSelect.title, author_name: bookSelect.author_name, cover_i: bookSelect.cover_i })
@@ -133,7 +133,7 @@ export function Wishlist() {
     }
 
     async function handleDeleteList(id: number){
-        await fetch(`${API_URL}/${id}`, { method: 'DELETE' })
+        await fetch(`${API_URL}/wishlists/${id}`, { method: 'DELETE' })
         setLists(lists.filter((list) => list.id !== id));
         setDialog(false);
         setShlistDelete(null);
