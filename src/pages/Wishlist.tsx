@@ -133,7 +133,8 @@ export function Wishlist() {
     }
 
     async function handleDeleteList(id: number){
-        await fetch(`${API_URL}/wishlists/${id}`, { method: 'DELETE' })
+        await fetch(`${API_URL}/wishlists
+            /${id}`, { method: 'DELETE' })
         setLists(lists.filter((list) => list.id !== id));
         setDialog(false);
         setShlistDelete(null);
